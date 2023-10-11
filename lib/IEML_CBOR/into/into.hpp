@@ -8,10 +8,10 @@ namespace ieml_cbor {
 	};
 	
 	template<typename FileGenerate_ = FileGenerate>
-	void intoCBOR(cbor::Encoder& encoder, const ieml::Node& node);
+	void into_cbor(cbor::Encoder& encoder, const ieml::Node& node);
 	
 	template<typename FileGenerate_ = FileGenerate>
-	void intoCBORFile(const ieml::FilePath& file_path, const ieml::Node& node);
+	void into_cbor_file(const ieml::FilePath& file_path, const ieml::Node& node);
 }
 
 #include "into.inl"

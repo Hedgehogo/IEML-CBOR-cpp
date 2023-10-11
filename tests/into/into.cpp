@@ -7,7 +7,7 @@ template<typename FileInclude_ = ieml_cbor::FileInclude, typename FileGenerate_ 
 ieml::Node test_into(ieml::Node const& node, ieml::RcPtr<ieml::AnchorKeeper> const& anchor_keeper = ieml::make_rc_ptr<ieml::AnchorKeeper>()) {
 	cbor::OutputDynamic output;
 	cbor::Encoder encoder(output);
-	ieml_cbor::intoCBOR<FileGenerate_>(encoder, ieml::FileData{node, {}, ieml::make_rc_ptr<ieml::AnchorKeeper>()});
+	ieml_cbor::into_cbor<FileGenerate_>(encoder, ieml::FileData{node, {}, ieml::make_rc_ptr<ieml::AnchorKeeper>()});
 	
 	cbor::Input input(output.data(), static_cast<int>(output.size()));
 	return ieml_cbor::from_cbor<FileInclude_>(input, anchor_keeper).get_clear_file();
@@ -57,7 +57,7 @@ struct FileGenerate {
 	static void generate(const ieml::Node& node, const ieml::FilePath& file_path) {
 		cbor::OutputDynamic output{};
 		cbor::Encoder encoder{output};
-		ieml_cbor::intoCBOR(encoder, node);
+		ieml_cbor::into_cbor(encoder, node);
 		files.emplace(file_path.string(), std::vector<uint8_t>{output.data(), output.data() + output.size()});
 	}
 };
