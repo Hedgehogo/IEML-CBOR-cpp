@@ -4,21 +4,21 @@ namespace ieml_cbor {
 	namespace detail {
 		template<typename FileGenerate_>
 		void intoCBORItem(cbor::Encoder& encoder, const ieml::Node& node) {
-			auto type{node.getType()};
+			auto type{node.get_type()};
 			encoder.write_array(2);
-			encoder.write_int(static_cast<std::int32_t>(ieml::getIndexFromNodeType(type)));
+			encoder.write_int(static_cast<std::int32_t>(ieml::get_index_from_node_type(type)));
 			switch(type) {
 				case ieml::NodeType::Null:
 					encoder.write_null();
 					break;
 				case ieml::NodeType::Raw:
-					encoder.write_string(node.getRaw().ok().str);
+					encoder.write_string(node.get_raw().ok().str);
 					break;
 				case ieml::NodeType::String:
-					encoder.write_string(node.getString().ok());
+					encoder.write_string(node.get_string().ok());
 					break;
 				case ieml::NodeType::List: {
-					auto list{node.getList()};
+					auto list{node.get_list()};
 					encoder.write_array(static_cast<int>(list.ok().size()));
 					for(const auto& iter: list.ok()) {
 						intoCBOR(encoder, iter);
@@ -26,7 +26,7 @@ namespace ieml_cbor {
 				}
 					break;
 				case ieml::NodeType::Map: {
-					auto map{node.getMap()};
+					auto map{node.get_map()};
 					encoder.write_map(static_cast<int>(map.ok().size()));
 					for(const auto& iter: map.ok()) {
 						encoder.write_string(iter.first);
@@ -35,36 +35,36 @@ namespace ieml_cbor {
 				}
 					break;
 				case ieml::NodeType::Tag: {
-					auto tag{node.getTag()};
+					auto tag{node.get_tag()};
 					encoder.write_array(2);
 					encoder.write_string(tag.some());
-					intoCBOR(encoder, node.getClearTag());
+					intoCBOR(encoder, node.get_clear_tag());
 				}
 					break;
 				case ieml::NodeType::File: {
-					auto filePath{node.getFilePath()};
+					auto file_path{node.get_file_path()};
 					encoder.write_array(2);
-					encoder.write_string(filePath.some().string());
+					encoder.write_string(file_path.some().string());
 					
-					auto& anchors{node.getFileAnchorKeeper().some().getFileMap()};
+					auto& anchors{node.get_file_anchor_keeper().some().get_file_map()};
 					encoder.write_map(static_cast<int>(anchors.size()));
 					for(const auto& anchor: anchors) {
 						encoder.write_string(anchor.first);
 						intoCBOR(encoder, anchor.second);
 					}
 					
-					intoCBORFile(filePath.some(), node.getClearFile());
+					intoCBORFile(file_path.some(), node.get_clear_file());
 				}
 					break;
 				case ieml::NodeType::TakeAnchor: {
-					auto name{node.getTakeAnchorName()};
+					auto name{node.get_take_anchor_name()};
 					encoder.write_array(2);
 					encoder.write_string(name.some());
-					intoCBOR(encoder, node.getClearTakeAnchor());
+					intoCBOR(encoder, node.get_clear_take_anchor());
 				}
 					break;
 				case ieml::NodeType::GetAnchor: {
-					auto name{node.getGetAnchorName()};
+					auto name{node.get_get_anchor_name()};
 					encoder.write_string(name.some());
 				}
 					break;
@@ -74,11 +74,11 @@ namespace ieml_cbor {
 	
 	template<typename FileGenerate_>
 	void intoCBOR(cbor::Encoder& encoder, const ieml::Node& node) {
-		detail::intoCBORItem<FileGenerate_>(encoder, node.getClearFile());
+		detail::intoCBORItem<FileGenerate_>(encoder, node.get_clear_file());
 	}
 	
 	template<typename FileGenerate_>
-	void intoCBORFile(const ieml::FilePath& filePath, const ieml::Node& node) {
-		FileGenerate_::generate(node, filePath);
+	void intoCBORFile(const ieml::FilePath& file_path, const ieml::Node& node) {
+		FileGenerate_::generate(node, file_path);
 	}
 }

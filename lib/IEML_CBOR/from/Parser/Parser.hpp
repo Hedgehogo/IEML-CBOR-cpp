@@ -10,57 +10,57 @@ namespace ieml_cbor {
 	class BasicParser {
 	private:
 		cbor::Decoder decoder_;
-		ieml::RcPtr<ieml::AnchorKeeper> anchorKeeper_;
-		ieml::FilePath filePath_;
+		ieml::RcPtr<ieml::AnchorKeeper> anchor_keeper_;
+		ieml::FilePath file_path_;
 		
-		cbor::DecoderState getState();
+		cbor::DecoderState get_state();
 		
 		template<cbor::DecoderState State>
-		void checkState();
+		void check_state();
 		
-		void checkBytes();
+		void check_bytes();
 		
-		void decodeType();
+		void decode_type();
 		
-		bool decodeStringSize();
+		bool decode_string_size();
 		
 	public:
-		BasicParser(cbor::Input& input, ieml::RcPtr<ieml::AnchorKeeper> anchorKeeper, ieml::FilePath filePath = ieml::FilePath{});
+		BasicParser(cbor::Input& input, ieml::RcPtr<ieml::AnchorKeeper> anchor_keeper, ieml::FilePath file_path = ieml::FilePath{});
 		
 		ieml::NodeData parse();
 		
-		ieml::NodeData parseNode();
+		ieml::NodeData parse_node();
 		
-		ieml::NullData parseNull();
+		ieml::NullData parse_null();
 		
-		ieml::RawData parseRaw();
+		ieml::RawData parse_raw();
 		
-		ieml::StringData parseString();
+		ieml::StringData parse_string();
 		
-		ieml::ListData parseList();
+		ieml::ListData parse_list();
 		
-		ieml::MapData parseMap();
+		ieml::MapData parse_map();
 		
-		ieml::TagData parseTag();
+		ieml::TagData parse_tag();
 		
-		ieml::FileData parseFile();
+		ieml::FileData parse_file();
 		
-		ieml::TakeAnchorData parseTakeAnchor();
+		ieml::TakeAnchorData parse_take_anchor();
 		
-		ieml::GetAnchorData parseGetAnchor();
+		ieml::GetAnchorData parse_get_anchor();
 	};
 	
 	using Parser = BasicParser<>;
 	
 	struct FileInclude {
-		static ieml::NodeData include(const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper, const ieml::FilePath& filePath);
+		static ieml::NodeData include(const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper, const ieml::FilePath& file_path);
 	};
 	
 	template<typename FileInclude_ = FileInclude>
-	ieml::Node fromCBOR(cbor::Input& input, const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper = ieml::makeRcPtr<ieml::AnchorKeeper>());
+	ieml::Node from_cbor(cbor::Input& input, const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper = ieml::make_rc_ptr<ieml::AnchorKeeper>());
 	
 	template<typename FileInclude_ = FileInclude>
-	ieml::Node fromCBORFile(const ieml::FilePath& filePath, const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper = ieml::makeRcPtr<ieml::AnchorKeeper>());
+	ieml::Node from_cbor_file(const ieml::FilePath& file_path, const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper = ieml::make_rc_ptr<ieml::AnchorKeeper>());
 }
 
 #include "Parser.inl"

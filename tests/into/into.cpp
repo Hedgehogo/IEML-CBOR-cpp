@@ -4,13 +4,13 @@
 #include <IEML_CBOR/into.hpp>
 
 template<typename FileInclude_ = ieml_cbor::FileInclude, typename FileGenerate_ = ieml_cbor::FileGenerate>
-ieml::Node test_into(ieml::Node const& node, ieml::RcPtr<ieml::AnchorKeeper> const& anchorKeeper = ieml::makeRcPtr<ieml::AnchorKeeper>()) {
+ieml::Node test_into(ieml::Node const& node, ieml::RcPtr<ieml::AnchorKeeper> const& anchor_keeper = ieml::make_rc_ptr<ieml::AnchorKeeper>()) {
 	cbor::OutputDynamic output;
 	cbor::Encoder encoder(output);
-	ieml_cbor::intoCBOR<FileGenerate_>(encoder, ieml::FileData{node, {}, ieml::makeRcPtr<ieml::AnchorKeeper>()});
+	ieml_cbor::intoCBOR<FileGenerate_>(encoder, ieml::FileData{node, {}, ieml::make_rc_ptr<ieml::AnchorKeeper>()});
 	
 	cbor::Input input(output.data(), static_cast<int>(output.size()));
-	return ieml_cbor::fromCBOR<FileInclude_>(input, anchorKeeper).getClearFile();
+	return ieml_cbor::from_cbor<FileInclude_>(input, anchor_keeper).get_clear_file();
 }
 
 TEST(into, null) {
@@ -46,45 +46,45 @@ TEST(into, tag) {
 static std::map<ieml::String, std::vector<uint8_t> > files{};
 
 struct FileInclude {
-	static ieml::NodeData include(const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper, const ieml::FilePath& filePath) {
-		cbor::Input input{files[filePath.string()].data(), static_cast<int>(files[filePath.string()].size())};
-		ieml_cbor::BasicParser<FileInclude> parser{input, anchorKeeper, filePath};
+	static ieml::NodeData include(const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper, const ieml::FilePath& file_path) {
+		cbor::Input input{files[file_path.string()].data(), static_cast<int>(files[file_path.string()].size())};
+		ieml_cbor::BasicParser<FileInclude> parser{input, anchor_keeper, file_path};
 		return parser.parse();
 	}
 };
 
 struct FileGenerate {
-	static void generate(const ieml::Node& node, const ieml::FilePath& filePath) {
+	static void generate(const ieml::Node& node, const ieml::FilePath& file_path) {
 		cbor::OutputDynamic output{};
 		cbor::Encoder encoder{output};
 		ieml_cbor::intoCBOR(encoder, node);
-		files.emplace(filePath.string(), std::vector<uint8_t>{output.data(), output.data() + output.size()});
+		files.emplace(file_path.string(), std::vector<uint8_t>{output.data(), output.data() + output.size()});
 	}
 };
 
 TEST(into, file) {
-	auto outputAnchorKeeper{ieml::makeRcPtr<ieml::AnchorKeeper>()};
-	outputAnchorKeeper->addToFile("anchor", ieml::NullData{});
-	ieml::Node node{ieml::FileData{ieml::NullData{}, ieml::FilePath{"test.cbor"}, outputAnchorKeeper}};
+	auto output_anchor_keeper{ieml::make_rc_ptr<ieml::AnchorKeeper>()};
+	output_anchor_keeper->add_to_file("anchor", ieml::NullData{});
+	ieml::Node node{ieml::FileData{ieml::NullData{}, ieml::FilePath{"test.cbor"}, output_anchor_keeper}};
 	
 	ASSERT_EQ(node, (test_into<FileInclude, FileGenerate>(node)));
 }
 
-TEST(into, takeAnchor) {
-	auto outputAnchorKeeper{ieml::makeRcPtr<ieml::AnchorKeeper>()};
-	outputAnchorKeeper->add("anchor", ieml::RawData{"hello"});
-	ieml::Node node{ieml::TakeAnchorData{outputAnchorKeeper, "anchor"}};
+TEST(into, take_anchor) {
+	auto output_anchor_keeper{ieml::make_rc_ptr<ieml::AnchorKeeper>()};
+	output_anchor_keeper->add("anchor", ieml::RawData{"hello"});
+	ieml::Node node{ieml::TakeAnchorData{output_anchor_keeper, "anchor"}};
 	
-	auto inputAnchorKeeper{ieml::makeRcPtr<ieml::AnchorKeeper>()};
-	ASSERT_EQ(node, (test_into(node, inputAnchorKeeper)));
-	ASSERT_EQ(outputAnchorKeeper->getMap(), inputAnchorKeeper->getMap());
+	auto input_anchor_keeper{ieml::make_rc_ptr<ieml::AnchorKeeper>()};
+	ASSERT_EQ(node, (test_into(node, input_anchor_keeper)));
+	ASSERT_EQ(output_anchor_keeper->get_map(), input_anchor_keeper->get_map());
 }
 
-TEST(into, getAnchor) {
-	auto outputAnchorKeeper{ieml::makeRcPtr<ieml::AnchorKeeper>()};
-	outputAnchorKeeper->add("anchor", ieml::RawData{"hello"});
-	ieml::Node node{ieml::GetAnchorData{outputAnchorKeeper, "anchor"}};
+TEST(into, get_anchor) {
+	auto output_anchor_keeper{ieml::make_rc_ptr<ieml::AnchorKeeper>()};
+	output_anchor_keeper->add("anchor", ieml::RawData{"hello"});
+	ieml::Node node{ieml::GetAnchorData{output_anchor_keeper, "anchor"}};
 	
-	ASSERT_EQ(node, (test_into(node, outputAnchorKeeper)));
-	ASSERT_EQ(node.getClearGetAnchor(), *outputAnchorKeeper->get("anchor"));
+	ASSERT_EQ(node, (test_into(node, output_anchor_keeper)));
+	ASSERT_EQ(node.get_clear_get_anchor(), *output_anchor_keeper->get("anchor"));
 }

@@ -4,13 +4,13 @@
 
 namespace ieml_cbor {
 	template<typename FileInclude_>
-	ieml::Node fromCBOR(cbor::Input& input, const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper) {
-		BasicParser<FileInclude_> parser{input, anchorKeeper};
-		return ieml::Node{ieml::FileData{parser.parse(), {}, anchorKeeper}};
+	ieml::Node from_cbor(cbor::Input& input, const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper) {
+		BasicParser<FileInclude_> parser{input, anchor_keeper};
+		return ieml::Node{ieml::FileData{parser.parse(), {}, anchor_keeper}};
 	}
 	
 	template<typename FileInclude_>
-	ieml::Node fromCBORFile(const ieml::FilePath& filePath, const ieml::RcPtr<ieml::AnchorKeeper>& anchorKeeper) {
-		return ieml::Node{ieml::FileData{FileInclude_::include(anchorKeeper, filePath), filePath, anchorKeeper}};
+	ieml::Node from_cbor_file(const ieml::FilePath& file_path, const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper) {
+		return ieml::Node{ieml::FileData{FileInclude_::include(anchor_keeper, file_path), file_path, anchor_keeper}};
 	}
 }
