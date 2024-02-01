@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
 project(IEML_CBOR_cpp)
+set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 17)
-
+option(IEML_CBOR_ENABLE_INSTALL "Enable install rule" ON)
 
 FetchContent_Declare(
         IEML_cpp
@@ -44,17 +44,18 @@ add_executable(${PROJECT_NAME}_tests ${test_src})
 
 target_link_libraries(${PROJECT_NAME}_tests PRIVATE gtest gtest_main ${PROJECT_NAME})
 
+if (IEML_CBOR_ENABLE_INSTALL)
+        install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib/IEML_CBOR DESTINATION ${CMAKE_INSTALL_PREFIX}/include PATTERN "*.hpp")
 
-install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib/IEML_CBOR DESTINATION ${CMAKE_INSTALL_PREFIX}/include PATTERN "*.hpp")
+        install(TARGETS ${PROJECT_NAME}
+                EXPORT ${PROJECT_NAME}
+                LIBRARY DESTINATION lib
+                PUBLIC_HEADER DESTINATION include/${PROJECT_NAME}
+                )
 
-install(TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION lib
-        PUBLIC_HEADER DESTINATION include/${PROJECT_NAME}
-        )
-
-install(EXPORT ${PROJECT_NAME}
-        FILE ${PROJECT_NAME}Config.cmake
-        NAMESPACE ${PROJECT_NAME}::
-        DESTINATION lib/cmake/${PROJECT_NAME}
-        )
+        install(EXPORT ${PROJECT_NAME}
+                FILE ${PROJECT_NAME}Config.cmake
+                NAMESPACE ${PROJECT_NAME}::
+                DESTINATION lib/cmake/${PROJECT_NAME}
+                )
+endif ()
