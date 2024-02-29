@@ -10,7 +10,7 @@ TEST(from, null) {
 	encoder.write_null();
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto null{ieml_cbor::from_cbor(input)};
+	auto const null{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(null.get_clear_file().get_type(), ieml::NodeType::Null);
 }
 
@@ -22,7 +22,7 @@ TEST(from, raw) {
 	encoder.write_string("hello");
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto raw{ieml_cbor::from_cbor(input)};
+	auto const raw{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(raw.get_clear_file().get_type(), ieml::NodeType::Raw);
 	ASSERT_EQ(raw.get_clear_file().get_raw().except().str, "hello");
 }
@@ -35,7 +35,7 @@ TEST(from, string) {
 	encoder.write_string("hello");
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto string{ieml_cbor::from_cbor(input)};
+	auto const string{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(string.get_clear_file().get_type(), ieml::NodeType::String);
 	ASSERT_EQ(string.get_clear_file().get_string().except(), "hello");
 }
@@ -58,7 +58,7 @@ TEST(from, list) {
 	}
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto list{ieml_cbor::from_cbor(input)};
+	auto const list{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(list.get_clear_file().get_type(), ieml::NodeType::List);
 	ASSERT_EQ(list.get_list_size().except(), 2);
 	ASSERT_EQ(list.at(0).except().get_type(), ieml::NodeType::Null);
@@ -86,7 +86,7 @@ TEST(from, map) {
 	}
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto map{ieml_cbor::from_cbor(input)};
+	auto const map{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(map.get_clear_file().get_type(), ieml::NodeType::Map);
 	ASSERT_EQ(map.get_map_size().except(), 2);
 	ASSERT_EQ(map.get_map().except().at("first").get_type(), ieml::NodeType::Null);
@@ -108,7 +108,7 @@ TEST(from, tag) {
 	}
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto tag{ieml_cbor::from_cbor(input)};
+	auto const tag{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(tag.get_clear_file().get_type(), ieml::NodeType::Tag);
 	ASSERT_EQ(tag.get_tag().except(), "tag");
 	ASSERT_EQ(tag.get_clear_file().get_clear_tag().get_type(), ieml::NodeType::String);
@@ -150,7 +150,7 @@ TEST(from, file) {
 	}
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto file{ieml_cbor::from_cbor<::FileInclude>(input)};
+	auto const file{ieml_cbor::from_cbor<::FileInclude>(input)};
 	ASSERT_EQ(file.get_clear_file().get_type(), ieml::NodeType::File);
 	ASSERT_EQ(file.get_clear_file().get_file_path().except(), "test.cbor");
 	ASSERT_EQ(file.get_clear_file().get_clear_file().get_type(), ieml::NodeType::Null);
@@ -172,7 +172,7 @@ TEST(from, take_anchor) {
 	}
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto map{ieml_cbor::from_cbor(input)};
+	auto const map{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(map.get_clear_file().get_type(), ieml::NodeType::TakeAnchor);
 	ASSERT_EQ(map.get_take_anchor_name().except(), "take-name");
 	ASSERT_EQ(map.get_clear_file().get_clear_take_anchor().get_type(), ieml::NodeType::String);
@@ -187,7 +187,7 @@ TEST(from, get_anchor) {
 	encoder.write_string("get-name");
 	
 	auto input{cbor::Input{output.data(), static_cast<int>(output.size())}};
-	const auto map{ieml_cbor::from_cbor(input)};
+	auto const map{ieml_cbor::from_cbor(input)};
 	ASSERT_EQ(map.get_clear_file().get_type(), ieml::NodeType::GetAnchor);
 	ASSERT_EQ(map.get_get_anchor_name().except(), "get-name");
 }

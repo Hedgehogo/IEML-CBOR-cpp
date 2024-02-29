@@ -20,7 +20,7 @@ namespace ieml_cbor {
 				case ieml::NodeType::List: {
 					auto& list{node.get_list().ok()};
 					encoder.write_array(static_cast<int>(list.size()));
-					for(const auto& iter: list) {
+					for(auto const& iter: list) {
 						into_cbor(encoder, iter);
 					}
 				}
@@ -28,7 +28,7 @@ namespace ieml_cbor {
 				case ieml::NodeType::Map: {
 					auto& map{node.get_map().ok()};
 					encoder.write_map(static_cast<int>(map.size()));
-					for(const auto& iter: map) {
+					for(auto const& iter: map) {
 						encoder.write_string(iter.first);
 						into_cbor(encoder, iter.second);
 					}
@@ -48,7 +48,7 @@ namespace ieml_cbor {
 					
 					auto& anchors{node.get_file_anchor_keeper().some().get_file_map()};
 					encoder.write_map(static_cast<int>(anchors.size()));
-					for(const auto& anchor: anchors) {
+					for(auto const& anchor: anchors) {
 						encoder.write_string(anchor.first);
 						into_cbor(encoder, anchor.second);
 					}
