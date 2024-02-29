@@ -1,7 +1,7 @@
 #include "Parser.hpp"
 
 namespace ieml_cbor {
-	ieml::NodeData FileInclude::include(const ieml::RcPtr<ieml::AnchorKeeper>& anchor_keeper, const ieml::FilePath& file_path) {
+	auto FileInclude::include(ieml::RcPtr<ieml::AnchorKeeper> const& anchor_keeper, ieml::FilePath const& file_path) -> ieml::NodeData {
 		std::ifstream stream{file_path, std::ios::in | std::ios::binary};
 		std::streamsize size{static_cast<std::streamsize>(std::filesystem::file_size(file_path))};
 		std::vector<char> data(size);

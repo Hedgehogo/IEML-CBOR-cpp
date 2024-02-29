@@ -4,14 +4,14 @@
 
 namespace ieml_cbor {
 	struct FileGenerate {
-		static void generate(const ieml::Node& node, const ieml::FilePath& file_path);
+		static auto generate(ieml::Node const& node, ieml::FilePath const& file_path) -> void;
 	};
 	
 	template<typename FileGenerate_ = FileGenerate>
-	void into_cbor(cbor::Encoder& encoder, const ieml::Node& node);
+	auto into_cbor(cbor::Encoder& encoder, ieml::Node const& node) -> void;
 	
 	template<typename FileGenerate_ = FileGenerate>
-	void into_cbor_file(const ieml::FilePath& file_path, const ieml::Node& node);
+	auto into_cbor_file(ieml::FilePath const& file_path, ieml::Node const& node) -> void;
 }
 
 #include "into.inl"

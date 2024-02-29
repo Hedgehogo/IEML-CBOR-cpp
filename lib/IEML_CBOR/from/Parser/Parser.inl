@@ -9,27 +9,27 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	cbor::DecoderState BasicParser<FileInclude_>::get_state() {
+	auto BasicParser<FileInclude_>::get_state() -> cbor::DecoderState {
 		return decoder_.get_state();
 	}
 	
 	template<typename FileInclude_>
 	template<cbor::DecoderState State>
-	void BasicParser<FileInclude_>::check_state() {
+	auto BasicParser<FileInclude_>::check_state() -> void {
 		if(decoder_.get_state() != State) {
 			throw FailedParseException{FailedParseException::Reason::InvalidDocumentStructure};
 		}
 	}
 	
 	template<typename FileInclude_>
-	void BasicParser<FileInclude_>::check_bytes() {
+	auto BasicParser<FileInclude_>::check_bytes() -> void {
 		if(!decoder_.has_bytes()) {
 			throw FailedParseException{FailedParseException::Reason::IncompleteDocument};
 		}
 	}
 	
 	template<typename FileInclude_>
-	void BasicParser<FileInclude_>::decode_type() {
+	auto BasicParser<FileInclude_>::decode_type() -> void {
 		if(!decoder_.has_bytes(1)) {
 			throw FailedParseException{FailedParseException::Reason::IncompleteDocument};
 		}
@@ -37,7 +37,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	bool BasicParser<FileInclude_>::decode_string_size() {
+	auto BasicParser<FileInclude_>::decode_string_size() -> bool {
 		if(get_state() == cbor::DecoderState::StringSize) {
 			decoder_.decode_string_size();
 			check_bytes();
@@ -48,12 +48,12 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::NodeData BasicParser<FileInclude_>::parse() {
+	auto BasicParser<FileInclude_>::parse() -> ieml::NodeData {
 		return parse_node();
 	}
 	
 	template<typename FileInclude_>
-	ieml::NodeData BasicParser<FileInclude_>::parse_node() {
+	auto BasicParser<FileInclude_>::parse_node() -> ieml::NodeData {
 		decode_type();
 		check_state<cbor::DecoderState::Array>();
 		check_bytes();
@@ -65,7 +65,7 @@ namespace ieml_cbor {
 		decode_type();
 		check_state<cbor::DecoderState::PInt>();
 		check_bytes();
-		ieml::NodeType type{ieml::get_node_type_from_index(decoder_.decode_p_int())};
+		auto type{ieml::get_node_type_from_index(decoder_.decode_p_int())};
 		
 		decode_type();
 		check_bytes();
@@ -92,13 +92,13 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::NullData BasicParser<FileInclude_>::parse_null() {
+	auto BasicParser<FileInclude_>::parse_null() -> ieml::NullData {
 		check_state<cbor::DecoderState::Null>();
 		return {};
 	}
 	
 	template<typename FileInclude_>
-	ieml::RawData BasicParser<FileInclude_>::parse_raw() {
+	auto BasicParser<FileInclude_>::parse_raw() -> ieml::RawData {
 		if(decode_string_size()) {
 			check_bytes();
 		}
@@ -107,7 +107,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::StringData BasicParser<FileInclude_>::parse_string() {
+	auto BasicParser<FileInclude_>::parse_string() -> ieml::StringData {
 		if(decode_string_size()) {
 			check_bytes();
 		}
@@ -116,7 +116,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::ListData BasicParser<FileInclude_>::parse_list() {
+	auto BasicParser<FileInclude_>::parse_list() -> ieml::ListData {
 		check_state<cbor::DecoderState::Array>();
 		auto size{decoder_.decode_array_size()};
 		
@@ -129,7 +129,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::MapData BasicParser<FileInclude_>::parse_map() {
+	auto BasicParser<FileInclude_>::parse_map() -> ieml::MapData {
 		check_state<cbor::DecoderState::Map>();
 		auto size{decoder_.decode_map_size()};
 		
@@ -149,7 +149,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::TagData BasicParser<FileInclude_>::parse_tag() {
+	auto BasicParser<FileInclude_>::parse_tag() -> ieml::TagData {
 		check_state<cbor::DecoderState::Array>();
 		if(decoder_.decode_array_size() != 2) {
 			throw FailedParseException{FailedParseException::Reason::InvalidDocumentStructure};
@@ -159,13 +159,13 @@ namespace ieml_cbor {
 		decode_string_size();
 		check_state<cbor::DecoderState::StringData>();
 		check_bytes();
-		ieml::String tag{decoder_.decode_string_data()};
+		auto tag{decoder_.decode_string_data()};
 		
-		return {ieml::TagData{parse_node(), tag}};
+		return {ieml::TagData{parse_node(), std::move(tag)}};
 	}
 	
 	template<typename FileInclude_>
-	ieml::FileData BasicParser<FileInclude_>::parse_file() {
+	auto BasicParser<FileInclude_>::parse_file() -> ieml::FileData {
 		check_state<cbor::DecoderState::Array>();
 		if(decoder_.decode_array_size() != 2) {
 			throw FailedParseException{FailedParseException::Reason::InvalidDocumentStructure};
@@ -175,14 +175,14 @@ namespace ieml_cbor {
 		decode_string_size();
 		check_state<cbor::DecoderState::StringData>();
 		check_bytes();
-		ieml::FilePath file_path{decoder_.decode_string_data()};
+		auto file_path{ieml::FilePath{decoder_.decode_string_data()}};
 		
 		decode_type();
 		check_state<cbor::DecoderState::Map>();
 		check_bytes();
-		uint32_t size{decoder_.decode_map_size()};
+		auto size{size_t{decoder_.decode_map_size()}};
 		
-		ieml::RcPtr<ieml::AnchorKeeper> loaded_anchor_keeper{anchor_keeper_};
+		auto loaded_anchor_keeper{anchor_keeper_};
 		for(uint32_t i = 0; i < size; ++i) {
 			decode_type();
 			decode_string_size();
@@ -197,7 +197,7 @@ namespace ieml_cbor {
 	}
 	
 	template<typename FileInclude_>
-	ieml::TakeAnchorData BasicParser<FileInclude_>::parse_take_anchor() {
+	auto BasicParser<FileInclude_>::parse_take_anchor() -> ieml::TakeAnchorData {
 		check_state<cbor::DecoderState::Array>();
 		if(decoder_.decode_array_size() != 2) {
 			throw FailedParseException{FailedParseException::Reason::InvalidDocumentStructure};
@@ -207,14 +207,14 @@ namespace ieml_cbor {
 		decode_string_size();
 		check_state<cbor::DecoderState::StringData>();
 		check_bytes();
-		ieml::String name{decoder_.decode_string_data()};
+		auto name{decoder_.decode_string_data()};
 		
 		anchor_keeper_->add(name, parse_node());
 		return {ieml::TakeAnchorData{anchor_keeper_, name}};
 	}
 	
 	template<typename FileInclude_>
-	ieml::GetAnchorData BasicParser<FileInclude_>::parse_get_anchor() {
+	auto BasicParser<FileInclude_>::parse_get_anchor() -> ieml::GetAnchorData {
 		decode_string_size();
 		check_state<cbor::DecoderState::StringData>();
 		check_bytes();

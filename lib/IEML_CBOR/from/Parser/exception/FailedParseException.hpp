@@ -9,15 +9,13 @@ namespace ieml_cbor {
 			IncompleteDocument,
 			InvalidDocumentStructure,
 			ExpectedNodeType,
-			
 		};
+	
+		explicit FailedParseException(Reason reason);
+		
+		[[nodiscard]] auto get_description() const -> std::string override;
 	
 	private:
 		Reason reason_;
-	
-	public:
-		FailedParseException(Reason reason);
-		
-		std::string get_description() const override;
 	};
 }

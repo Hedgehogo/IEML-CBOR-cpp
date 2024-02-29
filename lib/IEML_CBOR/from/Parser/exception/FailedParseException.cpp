@@ -4,7 +4,7 @@ namespace ieml_cbor {
 	FailedParseException::FailedParseException(FailedParseException::Reason reason) : reason_(reason) {
 	}
 	
-	std::string FailedParseException::get_description() const {
+	auto FailedParseException::get_description() const -> std::string {
 		switch(reason_) {
 			case Reason::IncompleteDocument:
 				return "The document is not finished, but the input data has run out.";

@@ -1,12 +1,12 @@
 #include "into.hpp"
 
 namespace ieml_cbor {
-	void FileGenerate::generate(const ieml::Node& node, const ieml::FilePath& file_path) {
-		cbor::OutputDynamic output{};
-		cbor::Encoder encoder{output};
+	auto FileGenerate::generate(ieml::Node const& node, ieml::FilePath const& file_path) -> void {
+		auto output{cbor::OutputDynamic{}};
+		auto encoder{cbor::Encoder{output}};
 		into_cbor<FileGenerate>(encoder, node);
 		
-		std::ofstream stream{file_path, std::ios::out | std::ios::binary};
+		auto stream{std::ofstream{file_path, std::ios::out | std::ios::binary}};
 		stream.write(reinterpret_cast<char*>(output.data()), output.size());
 		stream.close();
 	}
